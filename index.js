@@ -14,7 +14,6 @@ morgan.token('logentry', function (request, response, next) {
       return JSON.stringify(request.body)
   } 
   return ''
-
 })
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :logentry'))
