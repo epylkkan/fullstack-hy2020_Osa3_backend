@@ -1,10 +1,8 @@
 console.log('hello world')
-
 const express = require('express')
 const app = express()
 const cors = require('cors')
 const morgan = require('morgan')
-
 
 app.use(express.json())
 app.use(express.static('build'))
@@ -19,33 +17,33 @@ morgan.token('logentry', function (request, response, next) {
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :logentry'))
 
+app.get('/', (req, res) => {  
+  res.send('<h1>Welcome to Phonebook</h1>')
+})
+
 let persons = 
 [
     {
       "name": "Arto Hellas",
-      "number": "040-123457",
+      "number": "040-123456",
       "id": 1
     },
     {
       "name": "Ada Lovelace",
-      "number": "39-44-5323527",
+      "number": "39-44-5323523",
       "id": 2
     },
     {
       "name": "Dan Abramov",
-      "number": "12-43-234347",
+      "number": "12-43-234345",
       "id": 3
     },
     {
       "name": "Mary Poppendieck",
-      "number": "39-23-6423127",
+      "number": "39-23-6423122",
       "id": 4
     }
 ]
-
-app.get('/', (req, res) => {  
-  res.send('<h1>Welcome to Phonebook</h1>')
-})
 
 app.get('/info', (request, response) => {
   const dateTimeNow = new Date()
@@ -54,18 +52,22 @@ app.get('/info', (request, response) => {
 })
 
 app.get('/api/persons', (request, response) => {
+  //Person.find({}).then(p => {
+  //response.json(p.map(p => p.toJSON()))
   response.json(persons)
-})
+  })
+  
 
 app.get('/api/persons/:id', (request, response) => {
   const id = Number(request.params.id)
   const person = persons.find(p => p.id === id)
 
   if (person) {
-    response.json(person)
+    response.json(person)    
   } else {
     response.status(404).end()
   }
+  
 })
 
 
@@ -84,6 +86,7 @@ app.post('/api/persons', (request, response) => {
       error: 'name must be unique' 
     })
   }
+ 
   const person = {
     name: body.name,
     number: body.number, 
@@ -91,31 +94,29 @@ app.post('/api/persons', (request, response) => {
    // id: generateId()
   }
 
+  
   persons = persons.concat(person)
   response.json(person)
-/*
-  person.save().then(savedPerson => {
-    response.json(savedPerson.toJSON())
-})
-    .catch(error => next(error))
-    */
-})
 
-app.delete('/api/persons/:id', (request, response) => {
+     
+  })
+
+app.delete('/api/persons/:id', (request, response, next) => {
   const id = Number(request.params.id)
+  
   persons = persons.filter(p => p.id !== id)
-
   response.status(204).end()
+
 })
 
-
+/*
 const generateId = () => {
   const maxId = persons.length > 0
-    ? Math.max(...persons.map(n => n.id))
+    ? Math.max(...persons.map(p => p.id))
     : 0
   return maxId + 1
 }
-
+*/
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
